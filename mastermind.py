@@ -18,7 +18,7 @@ color_dic = {
     8:'noir'
 }
 
-# Nombre d'essais possibles
+# Nombre d'essais possibles : 12 comme dans le mastermind original
 max_nb_try = 12
 chiffres = '12345678'
 str_col = " | ".join([f"{key} : {value}" for (key, value) in color_dic.items()])
@@ -73,11 +73,9 @@ def main():
             print(f"Vous avez choisi la combinaison : {', '.join(translate(user_combi))}.")
             # couleurs bien placées
             good_place = 0
-            tab_founds = []
             for i in range(4):
                 if user_combi[i] == computer_combi[i]:
                     good_place+=1
-                    tab_founds.append(computer_combi[i])
             print(f"Il y a {good_place} " + ("couleurs bien placées." if good_place>1 else "couleur bien placée."))        
             # utiliser un opérateur pour ajouter seulement le s si condition (bool ? str1:str2) idée de floshock
             # found=True
@@ -87,19 +85,18 @@ def main():
             temp_combi = computer_combi.copy()
             for num in user_combi:
                 if num in temp_combi:
-                    if num not in tab_founds:
-                        good_col+=1
-                        temp_combi.remove(num)
+                    good_col+=1
+                    temp_combi.remove(num)
+            good_col-=good_place
             print(f"Il y a {good_col} " + ("couleurs mal placées." if good_col>1 else "couleur mal placée."))
             print("")
-
             if good_place == 4:
                 found=True
                 print(f"Vous avez gagné en {nb_try} essais !")
         if nb_try >= max_nb_try and found==False:
             print("")
             print("Vous avez dépassé le nombre maximum d'essais ! Dommage...")
-            print(f"L'ordinateur avait choisi {', '.join(translate(computer_combi))} comme combinaison.")
+            print(f"L'ordinateur avait choisi {', '.join(translate(computer_combi))} {computer_combi} comme combinaison.")
             print("À bientôt !")
 
 #### Partie 2 : Version orientée objet #### 
@@ -118,6 +115,8 @@ class Mastermind():
                         }
         self.chiffres = '12345678'
         self.combinaison = gen_rnd_combination(dic=self.color_dic)
+        self.found = False
+        self.nb_try = 0
     
     def translate(self, combi):
         return translate(combi, dic=self.color_dic)
@@ -147,6 +146,28 @@ class Mastermind():
                 print("")
         return [int(num) for num in answer]
 
+    def place_col(self, user_combi):
+        # couleurs bien placées
+        good_place = 0
+        for i in range(4):
+            if user_combi[i] == self.combinaison[i]:
+                good_place+=1
+        print(f"Il y a {good_place} " + ("couleurs bien placées." if good_place>1 else "couleur bien placée."))        
+
+        # couleurs mal placées
+        good_col= 0
+        temp_combi = self.combinaison.copy()
+        for num in user_combi:
+            if num in temp_combi:
+                good_col+=1
+                temp_combi.remove(num)
+        good_col-=good_place
+
+        print(f"Il y a {good_col} " + ("couleurs mal placées." if good_col>1 else "couleur mal placée."))
+        if good_place == 4:
+            self.found=True
+            print(f"Vous avez gagné en {self.nb_try} essais !")
+
     def play(self):
         print("")
         start=input("Bienvenue sur Mastermind !\nVoulez-vous débuter une partie ? (y/n) : ")
@@ -162,41 +183,18 @@ class Mastermind():
             print("L'ordinateur a choisi !")
 
             # le jeu
-            
-            found = False
-            nb_try=0
 
-            while found==False and nb_try < max_nb_try:
+            while self.found==False and self.nb_try < max_nb_try:
                 answer=self.ask_user()
-                nb_try += 1
+                self.nb_try += 1
                 print(f"Vous avez choisi la combinaison : {', '.join(self.translate(answer))}.")
-                # couleurs bien placées
-                good_place = 0
-                tab_founds = []
-                for i in range(4):
-                    if answer[i] == self.combinaison[i]:
-                        good_place+=1
-                        tab_founds.append(self.combinaison[i])
-                print(f"Il y a {good_place} " + ("couleurs bien placées." if good_place>1 else "couleur bien placée."))        
-
-                # couleurs mal placées
-                good_col= 0
-                temp_combi = self.combinaison.copy()
-                for num in answer:
-                    if num in temp_combi:
-                        if num not in tab_founds:
-                            good_col+=1
-                            temp_combi.remove(num)
-                print(f"Il y a {good_col} " + ("couleurs mal placées." if good_col>1 else "couleur mal placée."))
+                self.place_col(user_combi=answer)
                 print("")
 
-                if good_place == 4:
-                    found=True
-                    print(f"Vous avez gagné en {nb_try} essais !")
-            if nb_try >= max_nb_try and found==False:
+            if self.nb_try >= max_nb_try and self.found==False:
                 print("")
                 print("Vous avez dépassé le nombre maximum d'essais ! Dommage...")
-                print(f"L'ordinateur avait choisi {', '.join(self.translate(self.combinaison))} comme combinaison.")
+                print(f"L'ordinateur avait choisi {', '.join(self.translate(self.combinaison))} {self.combinaison} comme combinaison.")
                 print("À bientôt !")
 
 if __name__ == "__main__":
