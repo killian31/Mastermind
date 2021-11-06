@@ -114,12 +114,13 @@ class Mastermind():
                         8:'noir'
                         }
         self.chiffres = '12345678'
-        self.combinaison = gen_rnd_combination(dic=self.color_dic)
+        self.__combinaison = [random.choice(list(self.color_dic.keys())) for _ in range(4)]
         self.found = False
         self.nb_try = 0
+        self.__max_nb_try = 12
     
     def translate(self, combi):
-        return translate(combi, dic=self.color_dic)
+        return [self.color_dic[nombre] for nombre in combi]
 
     def print_dic(self):
         print(" | ".join([f"{key} : {value}" for (key, value) in self.color_dic.items()]))
@@ -150,13 +151,13 @@ class Mastermind():
         # couleurs bien placées
         good_place = 0
         for i in range(4):
-            if user_combi[i] == self.combinaison[i]:
+            if user_combi[i] == self.__combinaison[i]:
                 good_place+=1
         print(f"Il y a {good_place} " + ("couleurs bien placées." if good_place>1 else "couleur bien placée."))        
 
         # couleurs mal placées
         good_col= 0
-        temp_combi = self.combinaison.copy()
+        temp_combi = self.__combinaison.copy()
         for num in user_combi:
             if num in temp_combi:
                 good_col+=1
@@ -184,17 +185,17 @@ class Mastermind():
 
             # le jeu
 
-            while self.found==False and self.nb_try < max_nb_try:
+            while self.found==False and self.nb_try < self.__max_nb_try:
                 answer=self.ask_user()
                 self.nb_try += 1
                 print(f"Vous avez choisi la combinaison : {', '.join(self.translate(answer))}.")
                 self.place_col(user_combi=answer)
                 print("")
 
-            if self.nb_try >= max_nb_try and self.found==False:
+            if self.nb_try >= self.__max_nb_try and self.found==False:
                 print("")
                 print("Vous avez dépassé le nombre maximum d'essais ! Dommage...")
-                print(f"L'ordinateur avait choisi {', '.join(self.translate(self.combinaison))} {self.combinaison} comme combinaison.")
+                print(f"L'ordinateur avait choisi {', '.join(self.translate(self.__combinaison))} {self.__combinaison} comme combinaison.")
                 print("À bientôt !")
 
 if __name__ == "__main__":
