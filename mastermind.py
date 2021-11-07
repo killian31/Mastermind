@@ -113,6 +113,7 @@ class Mastermind():
                         7:'blanc',
                         8:'noir'
                         }
+        self.history = []
         self.chiffres = '12345678'
         self.__combinaison = [random.choice(list(self.color_dic.keys())) for _ in range(4)]
         self.found = False
@@ -145,7 +146,8 @@ class Mastermind():
                 print("")
                 print("!!! Erreur. Veuillez saisir 4 CHIFFRES de la liste !!!")
                 print("")
-        return [int(num) for num in answer]
+        output = [int(num) for num in answer]
+        return output
 
     def place_col(self, user_combi):
         # couleurs bien placées
@@ -169,6 +171,12 @@ class Mastermind():
             self.found=True
             print(f"Vous avez gagné en {self.nb_try} essais !")
 
+    def print_history(self):
+        if self.nb_try > 0:
+            print("Combinaisons déjà rentrées :")
+            for combi in self.history:
+                print(combi, self.translate(combi))
+
     def play(self):
         print("")
         start=input("Bienvenue sur Mastermind !\nVoulez-vous débuter une partie ? (y/n) : ")
@@ -187,7 +195,9 @@ class Mastermind():
 
             while self.found==False and self.nb_try < self.__max_nb_try:
                 answer=self.ask_user()
+                self.history.append(answer)
                 self.nb_try += 1
+                self.print_history()               
                 print(f"Vous avez choisi la combinaison : {', '.join(self.translate(answer))}.")
                 self.place_col(user_combi=answer)
                 print("")
